@@ -1,26 +1,35 @@
 package ru.filatov.store.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "project")
 public class ProjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    Long id;
 
     @Column(unique = true)
-    private String name;
+    String name;
 
-    private Instant createdAt = Instant.now();
-    @OneToMany
-    private List<TaskStateEntity> taskStates;
+    @Builder.Default
+    Instant createdAt = Instant.now();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY)
+            @JoinColumn(name = "project_id", referencedColumnName = "id")
+    List<TaskStateEntity> taskStates = new ArrayList<>();
 
 }
