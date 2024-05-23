@@ -1,15 +1,14 @@
 package ru.filatov.exceptions;
 
 import lombok.AccessLevel;
-import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
@@ -20,9 +19,8 @@ import java.util.Map;
 @Controller
 public class CustomErrorController implements ErrorController {
     private static final String PATH = "/error";
-    ErrorAttributes errorAttributes;
-
-
+    @Autowired
+     ErrorAttributes errorAttributes;
 
     @RequestMapping(CustomErrorController.PATH)
     public ResponseEntity<ErrorDto> error(WebRequest webRequest) {
@@ -32,8 +30,7 @@ public class CustomErrorController implements ErrorController {
         );
         return ResponseEntity
                 .status((Integer) attributes.get("status"))
-                .body(
-                        ErrorDto
+                .body(ErrorDto
                                 .builder()
                                 .error((String) attributes.get("error"))
                                 .errorDescription((String) attributes.get("message"))
@@ -41,5 +38,7 @@ public class CustomErrorController implements ErrorController {
                 );
 
     }
+
+
 }
 

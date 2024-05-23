@@ -24,7 +24,7 @@ public class TaskStateEntity {
     String name;
 
 
-    @Builder.Default
+
     long ordinal;
 
     @Builder.Default

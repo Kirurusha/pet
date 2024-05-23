@@ -5,12 +5,17 @@ plugins {
 group = 'ru.filatov'
 version = '1.0-SNAPSHOT'
 
-sourceCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
 
 
 repositories {
     mavenCentral()
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-parameters'
+}
+
 dependencies{
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.2.5'
