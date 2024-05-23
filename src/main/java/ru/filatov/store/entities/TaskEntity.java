@@ -24,7 +24,8 @@ public class TaskEntity {
 
     String description;
 
-    long ordinal;
+
+
     @Builder.Default
     Instant createdAt = Instant.now();
 

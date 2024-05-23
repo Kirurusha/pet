@@ -1,6 +1,7 @@
 package ru.filatov.store.entities;
 
 import jakarta.persistence.*;
+import jdk.dynalink.linker.LinkerServices;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -23,6 +24,9 @@ public class ProjectEntity {
 
     @Column(unique = true)
     String name;
+
+    @Builder.Default
+    Instant updatedAt = Instant.now();
 
     @Builder.Default
     Instant createdAt = Instant.now();

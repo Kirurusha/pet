@@ -22,9 +22,14 @@ public class TaskStateEntity {
 
     @Column(unique = true)
     String name;
-    String description;
+
+
+    @Builder.Default
+    long ordinal;
+
     @Builder.Default
     Instant createdAt = Instant.now();
+
     @Builder.Default
     @OneToMany
             @JoinColumn(name = "task_state_id",referencedColumnName = "id")
