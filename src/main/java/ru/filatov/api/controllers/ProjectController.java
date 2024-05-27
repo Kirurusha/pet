@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import ru.filatov.api.controllers.helpers.ControllerHelper;
 import ru.filatov.api.dto.AckDto;
 import ru.filatov.api.dto.ProjectDto;
 import ru.filatov.api.factories.ProjectDtoFactory;
@@ -14,6 +15,7 @@ import ru.filatov.exceptions.BadRequestException;
 import ru.filatov.exceptions.NotFoundException;
 import ru.filatov.store.entities.ProjectEntity;
 import ru.filatov.store.repositories.ProjectRepository;
+import ru.filatov.store.repositories.TaskStateRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +33,9 @@ public class ProjectController {
 
     ProjectRepository projectRepository;
 
+    ControllerHelper controllerHelper;
+
+
     public static final String FETCH_PROJECTS = "/api/projects";
     public static final String CREATE_PROJECT = "/api/projects";
     public static final String EDIT_PROJECT = "/api/projects/{project_id}";
@@ -44,13 +49,13 @@ public class ProjectController {
         optionalPrefixName = optionalPrefixName.filter(prefixName -> !prefixName.trim().isEmpty());
         Stream<ProjectEntity> projectStream = optionalPrefixName
                 .map(projectRepository::streamAllByNameStartsWithIgnoreCase)
-                .orElseGet(projectRepository::streamAll);
+                .orElseGet(projectRepository::streamAllBy);
 
 
         if (optionalPrefixName.isPresent()) {
             projectStream = projectRepository.streamAllByNameStartsWithIgnoreCase(optionalPrefixName.get());
         } else {
-            projectStream = projectRepository.streamAll();
+            projectStream = projectRepository.streamAllBy();
         }
         return projectStream
                 .map(projectDtoFactory::makeProjectDto)
@@ -93,7 +98,7 @@ public class ProjectController {
             throw new BadRequestException(String.format("Name can't be empty", projectName));
         }
 
-        ProjectEntity project = getProjectOrThrowException(projectId);
+        ProjectEntity project = controllerHelper.getProjectOrThrowException(projectId);
 
         projectRepository
                 .findByName(projectName)
@@ -114,7 +119,7 @@ public class ProjectController {
 
     @DeleteMapping(DELETE_PROJECT)
     public AckDto deleteProject(@PathVariable("project_id") Long projectId) {
-        ProjectEntity project = getProjectOrThrowException(projectId);
+        ProjectEntity project = controllerHelper.getProjectOrThrowException(projectId);
 
 
         return AckDto.makeDefault(true);
@@ -137,7 +142,7 @@ public class ProjectController {
         }
 
        final  ProjectEntity project = optionalProjectId
-                .map(this::getProjectOrThrowException)
+                .map(controllerHelper::getProjectOrThrowException)
                 .orElseGet(() -> ProjectEntity.builder().build());
 
 
@@ -165,11 +170,6 @@ public class ProjectController {
     }
 
 
-    private ProjectEntity getProjectOrThrowException(Long projectId) {
-        return projectRepository
-                .findById(projectId)
-                .orElseThrow(() ->
-                        new NotFoundException(String.format("Project with id \"%s\" doesn't exists", projectId)));
-    }
+
 
 }
